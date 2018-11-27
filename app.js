@@ -62,11 +62,11 @@ function processPostback(event) {
             if (error) {
                 console.log("Error getting user's name: " +  error);
             } else {
-                var bodyObj = JSON.parse(body);
+                let bodyObj = JSON.parse(body);
                 let name = bodyObj.first_name;
                 greeting = "Hi " + name + ". ";
             }
-            var message = greeting + "My name is SP Movie Bot. I can tell you various details regarding movies. What movie would you like to know about?";
+            let message = greeting + "My name is Elad ChatBot. You can send me a messages and i promise to answer ";
             sendMessage(senderId, {text: message});
         });
     }
