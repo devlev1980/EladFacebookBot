@@ -27,7 +27,7 @@ app.get("/webhook", function (req, res) {
 // All callbacks for Messenger will be POST-ed here
 app.post("/webhook", function (req, res) {
     // Make sure this is a page subscription
-    if (req.body.object === "page") {
+    if (req.body.object == "page") {
         // Iterate over each entry
         // There may be multiple entries if batched
         req.body.entry.forEach(function(entry) {
@@ -44,8 +44,8 @@ app.post("/webhook", function (req, res) {
 });
 
 function processPostback(event) {
-    let senderId = event.sender.id;
-    let payload = event.postback.payload;
+    var senderId = event.sender.id;
+    var payload = event.postback.payload;
 
     if (payload === "Greeting") {
         // Get user's first name from the User Profile API
@@ -66,7 +66,7 @@ function processPostback(event) {
                 let name = bodyObj.first_name;
                 greeting = "Hi " + name + ". ";
             }
-            let message = greeting + "My name is Elad ChatBot. You can send me a messages and i promise to answer ";
+            let message = greeting + "My name is SP Movie Bot. I can tell you various details regarding movies. What movie would you like to know about?";
             sendMessage(senderId, {text: message});
         });
     }
