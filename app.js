@@ -3,6 +3,13 @@ const request = require("request");
 const bodyParser = require("body-parser");
 
 
+
+//Connect to Mongo DB
+var mongoose = require("mongoose");
+
+var db = mongoose.connect(process.env.MONGODB_URI);
+var Movie = require("./models/movie");
+
 const app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
