@@ -2,14 +2,26 @@ var express = require("express");
 var request = require("request");
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
+var mongoURL = 'mongodb://yevgenyl:papa2207@ds119024.mlab.com:19024/movies';
+mongoose.connect(mongoURL)
+    .then(() => { // if all is ok we will be here
+        console.log('MLab Connected');
+    })
+    .catch(err => { // if error we will be here
+        console.error('App starting error:', err.stack);
+        process.exit(1);
+    });
 
-var db = mongoose.connect(process.env.MONGODB_URI);
-var Movie = require("./models/movie");
+// var db = mongoose.connect(process.env.MONGODB_URI);
+
+var Question = require('models/question');
 
 var app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-app.listen((process.env.PORT || 5000));
+app.listen((process.env.PORT || 5000),function () {
+    console.log('Server running')
+});
 
 // Server index page
 app.get("/", function (req, res) {
@@ -116,72 +128,72 @@ function processMessage(event) {
     }
 }
 
-function findMovie(userId, movieTitle) {
-    request("http://www.omdbapi.com/?type=movie&t=" + movieTitle, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            var movieObj = JSON.parse(body);
-            if (movieObj.Response === "True") {
-                var query = {user_id: userId};
-                var update = {
-                    user_id: userId,
-                    title: movieObj.Title,
-                    plot: movieObj.Plot,
-                    date: movieObj.Released,
-                    runtime: movieObj.Runtime,
-                    director: movieObj.Director,
-                    cast: movieObj.Actors,
-                    rating: movieObj.imdbRating,
-                    poster_url:movieObj.Poster
-                };
-                var options = {upsert: true};
-                Movie.findOneAndUpdate(query, update, options, function(err, mov) {
-                    if (err) {
-                        console.log("Database error: " + err);
-                    } else {
-                        message = {
-                            attachment: {
-                                type: "template",
-                                payload: {
-                                    template_type: "generic",
-                                    elements: [{
-                                        title: movieObj.Title,
-                                        subtitle: "Is this the movie you are looking for?",
-                                        image_url: movieObj.Poster === "N/A" ? "http://placehold.it/350x150" : movieObj.Poster,
-                                        buttons: [{
-                                            type: "postback",
-                                            title: "Yes",
-                                            payload: "Correct"
-                                        }, {
-                                            type: "postback",
-                                            title: "No",
-                                            payload: "Incorrect"
-                                        }]
-                                    }]
-                                }
-                            }
-                        };
-                        sendMessage(userId, message);
-                    }
-                });
-            } else {
-                console.log(movieObj.Error);
-                sendMessage(userId, {text: movieObj.Error});
-            }
-        } else {
-            sendMessage(userId, {text: "Something went wrong. Try again."});
-        }
-    });
-}
+// function findMovie(userId, movieTitle) {
+//     request("http://www.omdbapi.com/?type=movie&t=" + movieTitle, function (error, response, body) {
+//         if (!error && response.statusCode == 200) {
+//             var movieObj = JSON.parse(body);
+//             if (movieObj.Response === "True") {
+//                 var query = {user_id: userId};
+//                 var update = {
+//                     user_id: userId,
+//                     title: movieObj.Title,
+//                     plot: movieObj.Plot,
+//                     date: movieObj.Released,
+//                     runtime: movieObj.Runtime,
+//                     director: movieObj.Director,
+//                     cast: movieObj.Actors,
+//                     rating: movieObj.imdbRating,
+//                     poster_url:movieObj.Poster
+//                 };
+//                 var options = {upsert: true};
+//                 Movie.findOneAndUpdate(query, update, options, function(err, mov) {
+//                     if (err) {
+//                         console.log("Database error: " + err);
+//                     } else {
+//                         message = {
+//                             attachment: {
+//                                 type: "template",
+//                                 payload: {
+//                                     template_type: "generic",
+//                                     elements: [{
+//                                         title: movieObj.Title,
+//                                         subtitle: "Is this the movie you are looking for?",
+//                                         image_url: movieObj.Poster === "N/A" ? "http://placehold.it/350x150" : movieObj.Poster,
+//                                         buttons: [{
+//                                             type: "postback",
+//                                             title: "Yes",
+//                                             payload: "Correct"
+//                                         }, {
+//                                             type: "postback",
+//                                             title: "No",
+//                                             payload: "Incorrect"
+//                                         }]
+//                                     }]
+//                                 }
+//                             }
+//                         };
+//                         sendMessage(userId, message);
+//                     }
+//                 });
+//             } else {
+//                 console.log(movieObj.Error);
+//                 sendMessage(userId, {text: movieObj.Error});
+//             }
+//         } else {
+//             sendMessage(userId, {text: "Something went wrong. Try again."});
+//         }
+//     });
+// }
 
-function getMovieDetail(userId, field) {
-    Movie.findOne({user_id: userId}, function(err, movie) {
-        if(err) {
-            sendMessage(userId, {text: "Something went wrong. Try again"});
-        } else {
-            sendMessage(userId, {text: movie[field]});
-        }
-    });
-}
+// function getMovieDetail(userId, field) {
+//     Movie.findOne({user_id: userId}, function(err, movie) {
+//         if(err) {
+//             sendMessage(userId, {text: "Something went wrong. Try again"});
+//         } else {
+//             sendMessage(userId, {text: movie[field]});
+//         }
+//     });
+// }
 
 // sends message to user
 function sendMessage(recipientId, message) {
