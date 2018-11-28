@@ -3,7 +3,7 @@ var request = require("request");
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 
-var db = mongoose.connect(process.env.MONGODB_URI);
+var db = mongoose.connect('mongodb://yevgenyl:papa2207@ds119024.mlab.com:19024/movies');
 var Movie = require("./models/movie");
 
 var app = express();
